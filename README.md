@@ -1,4 +1,4 @@
-# Omnipay: PayFast
+# Omnipay: PayU
 
 **Payu driver for the Omnipay PHP payment processing library**
 
@@ -31,7 +31,7 @@ And run composer to update your dependencies:
 
 The following gateways are provided by this package:
 
-* Payu
+* [PayU](https://payu.co.za)
 
 For general usage instructions, please see the main [Omnipay](https://github.com/thephpleague/omnipay)
 repository.
