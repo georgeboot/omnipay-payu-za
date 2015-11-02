@@ -11,17 +11,20 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
-    protected $redirectUrl;
+    protected $data;
+    protected $request;
 
-    public function __construct(RequestInterface $request, $data, $redirectUrl)
+    public function __construct(RequestInterface $request, \stdClass $data)
     {
         parent::__construct($request, $data);
-        $this->redirectUrl = $redirectUrl;
+
+        $this->data = $data;
+        $this->request = $request;
     }
 
     public function isSuccessful()
     {
-        return false;
+        return $this->data->successful;
     }
 
     public function isRedirect()
@@ -31,16 +34,16 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
 
     public function getRedirectUrl()
     {
-        return $this->redirectUrl;
+        return $this->request->getEndpoint().'/rpp.do?PayUReference='.$this->data->return->payUReference;
     }
 
     public function getRedirectMethod()
     {
-        return 'POST';
+        return 'GET';
     }
 
     public function getRedirectData()
     {
-        return $this->getData();
+        return [];
     }
 }

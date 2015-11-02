@@ -2,95 +2,48 @@
 
 namespace Omnipay\PayUZa\Message;
 
-use Omnipay\Common\Message\AbstractRequest;
-
 /**
  * PayFast Purchase Request
  */
 class PurchaseRequest extends AbstractRequest
 {
-    protected $liveEndpoint = 'https://www.payfast.co.za/eng';
-    protected $testEndpoint = 'https://sandbox.payfast.co.za/eng';
-
-    public function getMerchantId()
-    {
-        return $this->getParameter('merchantId');
-    }
-
-    public function setMerchantId($value)
-    {
-        return $this->setParameter('merchantId', $value);
-    }
-
-    public function getMerchantKey()
-    {
-        return $this->getParameter('merchantKey');
-    }
-
-    public function setMerchantKey($value)
-    {
-        return $this->setParameter('merchantKey', $value);
-    }
-
-    public function getPdtKey()
-    {
-        return $this->getParameter('pdtKey');
-    }
-
-    public function setPdtKey($value)
-    {
-        return $this->setParameter('pdtKey', $value);
-    }
-
     public function getData()
     {
         $this->validate('amount', 'description');
 
-        $data = array();
-        $data['merchant_id'] = $this->getMerchantId();
-        $data['merchant_key'] = $this->getMerchantKey();
-        $data['return_url'] = $this->getReturnUrl();
-        $data['cancel_url'] = $this->getCancelUrl();
-        $data['notify_url'] = $this->getReturnUrl();
+        $data['Api'] = self::VERSION;
+        $data['Safekey'] = $this->getSafekey();
+        $data['TransactionType'] = 'PAYMENT';
+        $data['AdditionalInformation']['merchantReference'] = $this->getTransactionId();
+        $data['AdditionalInformation']['cancelUrl'] = $this->getCancelUrl();
+        $data['AdditionalInformation']['returnUrl'] = $this->getReturnUrl();
+        $data['AdditionalInformation']['supportedPaymentMethods'] = 'CREDITCARD';
+
+        $data['Basket']['description'] = $this->getDescription();
+        $data['Basket']['amountInCents'] = $this->getAmount() * 100;
+        $data['Basket']['currencyCode'] = 'ZAR';
 
         if ($this->getCard()) {
-            $data['name_first'] = $this->getCard()->getFirstName();
-            $data['name_last'] = $this->getCard()->getLastName();
-            $data['email_address'] = $this->getCard()->getEmail();
+            $data['Customer']['merchantUserId'] = "7";
+            $data['Customer']['email'] = $this->getCard()->getEmail();
+            $data['Customer']['firstName'] = $this->getCard()->getFirstName();
+            $data['Customer']['lastName'] = $this->getCard()->getLastName();
+            $data['Customer']['mobile'] = '0211234567';
+            $data['Customer']['regionalId'] = '1234512345122';
+            $data['Customer']['countryCode'] = '27';
         }
-
-        $data['m_payment_id'] = $this->getTransactionId();
-        $data['amount'] = $this->getAmount();
-        $data['item_name'] = $this->getDescription();
-
-        $data['signature'] = $this->generateSignature($data);
 
         return $data;
     }
 
-    protected function generateSignature($data)
-    {
-        $fields = array();
-
-        // specific order required by PayFast
-        foreach (array('merchant_id', 'merchant_key', 'return_url', 'cancel_url', 'notify_url',
-            'name_first', 'name_last', 'email_address', 'm_payment_id', 'amount', 'item_name',
-            'item_description', 'email_confirmation', 'confirmation_address') as $key) {
-            if (!empty($data[$key])) {
-                $fields[$key] = $data[$key];
-            }
-        }
-
-        return md5(http_build_query($fields));
-    }
-
     public function sendData($data)
     {
-        return $this->response = new PurchaseResponse($this, $data, $this->getEndpoint().'/process');
-    }
-
-    public function getEndpoint()
-    {
-        return $this->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
+        try {
+            $result = $this->setTransaction($data);
+        } catch (\SoapFault $e) {
+            dd($this->client->__getLastRequest());
+        } finally {
+            return $this->response = new PurchaseResponse($this, $result);
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace Omnipay\PayUZa;
 use Omnipay\Common\AbstractGateway;
 
 /**
- * PayFast Gateway
+ * PayU Gateway
  *
  * Quote: The PayFast engine is basically a "black box" which processes a purchaser's payment.
  *
@@ -21,41 +21,41 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return array(
-            'merchantId' => '',
-            'merchantKey' => '',
-            'pdtKey' => '',
-            'testMode' => false,
+            'username' => '',
+            'password' => '',
+            'safekey' => '',
+            'testMode' => true,
         );
     }
 
-    public function getMerchantId()
+    public function getUsername()
     {
-        return $this->getParameter('merchantId');
+        return $this->getParameter('username');
     }
 
-    public function setMerchantId($value)
+    public function setUsername($value)
     {
-        return $this->setParameter('merchantId', $value);
+        return $this->setParameter('username', $value);
     }
 
-    public function getMerchantKey()
+    public function getPassword()
     {
-        return $this->getParameter('merchantKey');
+        return $this->getParameter('password');
     }
 
-    public function setMerchantKey($value)
+    public function setPassword($value)
     {
-        return $this->setParameter('merchantKey', $value);
+        return $this->setParameter('password', $value);
     }
 
-    public function getPdtKey()
+    public function getSafekey()
     {
-        return $this->getParameter('pdtKey');
+        return $this->getParameter('safekey');
     }
 
-    public function setPdtKey($value)
+    public function setSafekey($value)
     {
-        return $this->setParameter('pdtKey', $value);
+        return $this->setParameter('safekey', $value);
     }
 
     public function purchase(array $parameters = array())
