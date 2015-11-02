@@ -14,7 +14,7 @@ use Omnipay\Common\Message\AbstractRequest as OmniPayAbstractRequest;
  */
 abstract class AbstractRequest extends OmniPayAbstractRequest
 {
-    const LIVE_ENDPOINT = 'https://staging.payu.co.za/';
+    const LIVE_ENDPOINT = 'https://www.payu.co.za/';
     const TEST_ENDPOINT = 'https://staging.payu.co.za/';
 
     const VERSION = 'ONE_ZERO';
