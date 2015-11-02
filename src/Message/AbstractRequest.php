@@ -2,11 +2,9 @@
 
 namespace Omnipay\PayUZa\Message;
 
-use Guzzle\Http\ClientInterface;
 use SoapClient;
 use SoapHeader;
 use SoapVar;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Omnipay\Common\Message\AbstractRequest as OmniPayAbstractRequest;
 
 /**
@@ -14,8 +12,8 @@ use Omnipay\Common\Message\AbstractRequest as OmniPayAbstractRequest;
  */
 abstract class AbstractRequest extends OmniPayAbstractRequest
 {
-    const LIVE_ENDPOINT = 'https://www.payu.co.za/';
-    const TEST_ENDPOINT = 'https://staging.payu.co.za/';
+    const LIVE_ENDPOINT = 'https://www.payu.co.za';
+    const TEST_ENDPOINT = 'https://staging.payu.co.za';
 
     const VERSION = 'ONE_ZERO';
 
@@ -63,7 +61,7 @@ abstract class AbstractRequest extends OmniPayAbstractRequest
     private function setupClient()
     {
         if (null === $this->client) {
-            $this->client = new SoapClient($this->getEndpoint().'service/PayUAPI?wsdl', ['trace' => true]);
+            $this->client = new SoapClient($this->getEndpoint().'/service/PayUAPI?wsdl', ['trace' => true]);
             $this->client->__setSoapHeaders($this->getSecurityHeader());
         }
 
@@ -103,5 +101,15 @@ abstract class AbstractRequest extends OmniPayAbstractRequest
     public function setSafekey($value)
     {
         return $this->setParameter('safekey', $value);
+    }
+
+    public function getSupportedPaymentMethods()
+    {
+        return $this->getParameter('supportedPaymentMethods');
+    }
+
+    public function setSupportedPaymentMethods($value)
+    {
+        return $this->setParameter('supportedPaymentMethods', $value);
     }
 }

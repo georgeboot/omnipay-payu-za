@@ -1,6 +1,7 @@
 <?php
 
 namespace Omnipay\PayUZa\Message;
+use Omnipay\Common\Exception\InvalidRequestException;
 
 /**
  * PayFast Purchase Request
@@ -17,20 +18,18 @@ class PurchaseRequest extends AbstractRequest
         $data['AdditionalInformation']['merchantReference'] = $this->getTransactionId();
         $data['AdditionalInformation']['cancelUrl'] = $this->getCancelUrl();
         $data['AdditionalInformation']['returnUrl'] = $this->getReturnUrl();
-        $data['AdditionalInformation']['supportedPaymentMethods'] = 'CREDITCARD';
+        $data['AdditionalInformation']['supportedPaymentMethods'] = implode(',', $this->getParameter('supportedPaymentMethods'));
 
         $data['Basket']['description'] = $this->getDescription();
         $data['Basket']['amountInCents'] = $this->getAmount() * 100;
-        $data['Basket']['currencyCode'] = 'ZAR';
+        $data['Basket']['currencyCode'] = $this->getCurrency();
 
         if ($this->getCard()) {
-            $data['Customer']['merchantUserId'] = "7";
+            // $data['Customer']['merchantUserId'] = "7";
             $data['Customer']['email'] = $this->getCard()->getEmail();
             $data['Customer']['firstName'] = $this->getCard()->getFirstName();
             $data['Customer']['lastName'] = $this->getCard()->getLastName();
-            $data['Customer']['mobile'] = '0211234567';
-            $data['Customer']['regionalId'] = '1234512345122';
-            $data['Customer']['countryCode'] = '27';
+            $data['Customer']['mobile'] = $this->getCard()->getPhone();
         }
 
         return $data;
@@ -41,9 +40,9 @@ class PurchaseRequest extends AbstractRequest
         try {
             $result = $this->setTransaction($data);
         } catch (\SoapFault $e) {
-            dd($this->client->__getLastRequest());
-        } finally {
-            return $this->response = new PurchaseResponse($this, $result);
+            throw new InvalidRequestException('Error in API call', 0, $e);
         }
+
+        return $this->response = new PurchaseResponse($this, $result);
     }
 }
