@@ -20,6 +20,10 @@ class PurchaseRequest extends AbstractRequest
         $data['AdditionalInformation']['returnUrl'] = $this->getReturnUrl();
         $data['AdditionalInformation']['supportedPaymentMethods'] = implode(',', $this->getParameter('supportedPaymentMethods'));
 
+        if ($this->getNotifyUrl()) {
+            $data['AdditionalInformation']['notificationUrl'] = $this->getNotifyUrl();
+        }
+
         $data['Basket']['description'] = $this->getDescription();
         $data['Basket']['amountInCents'] = $this->getAmount() * 100;
         $data['Basket']['currencyCode'] = $this->getCurrency();
