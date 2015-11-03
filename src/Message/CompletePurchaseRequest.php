@@ -14,16 +14,25 @@ class CompletePurchaseRequest extends PurchaseRequest
 {
     public function getData()
     {
-        if ($this->httpRequest->query->get('PayUReference')) {
-            $data = [];
-            $data['Api'] = self::VERSION;
-            $data['Safekey'] = $this->getSafekey();
-            $data['AdditionalInformation']['payUReference'] = $this->httpRequest->query->get('PayUReference');
-
-            return $data;
+        if ($this->httpRequest->query->has('PayUReference')) {
+            $payUReference = $this->httpRequest->query->get('PayUReference');
+        } else {
+            $xmlObject = simplexml_load_string(file_get_contents('php://input'));
+            if (property_exists($xmlObject, 'PayUReference')) {
+                $payUReference = $xmlObject->PayUReference;
+            }
         }
 
-        throw new InvalidRequestException('Missing PayUReference parameter in request');
+        if (!isset($payUReference)) {
+            throw new InvalidRequestException('Missing PayUReference parameter in request');
+        }
+
+        $data = [];
+        $data['Api'] = self::VERSION;
+        $data['Safekey'] = $this->getSafekey();
+        $data['AdditionalInformation']['payUReference'] = $payUReference;
+
+        return $data;
     }
 
     public function sendData($data)
