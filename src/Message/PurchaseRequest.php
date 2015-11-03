@@ -44,7 +44,7 @@ class PurchaseRequest extends AbstractRequest
         try {
             $result = $this->setTransaction($data);
         } catch (\SoapFault $e) {
-            throw new InvalidRequestException('Error in API call', 0, $e);
+            throw new InvalidRequestException('Error in API call: '.$e->getMessage(), 0, $e);
         }
 
         return $this->response = new PurchaseResponse($this, $result);
