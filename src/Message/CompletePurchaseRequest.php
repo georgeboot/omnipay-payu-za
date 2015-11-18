@@ -18,8 +18,10 @@ class CompletePurchaseRequest extends PurchaseRequest
             $payUReference = $this->httpRequest->query->get('PayUReference');
         } else {
             $xmlObject = simplexml_load_string(file_get_contents('php://input'));
-            if (property_exists($xmlObject, 'PayUReference')) {
-                $payUReference = $xmlObject->PayUReference;
+            if (false != $xmlObject) {
+                if (property_exists($xmlObject, 'PayUReference')) {
+                    $payUReference = $xmlObject->PayUReference;
+                }
             }
         }
 
